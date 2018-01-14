@@ -6,7 +6,7 @@ import (
 	col "github.com/hiromaily/golibs/color"
 	gh "github.com/hiromaily/golibs/googlehome"
 	lg "github.com/hiromaily/golibs/log"
-	"github.com/saljam/mjpeg"
+	st "github.com/hiromaily/golibs/web/stream"
 	"gocv.io/x/gocv"
 	"image"
 	"image/color"
@@ -287,7 +287,7 @@ func webStreamer() {
 	defer img.Close()
 
 	// create the mjpeg stream
-	stream := mjpeg.NewStream()
+	stream := st.NewStream()
 
 	// start capturing
 	go func() {
