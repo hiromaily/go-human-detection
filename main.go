@@ -14,7 +14,11 @@ import (
 )
 
 const (
+	// minimum of detecting face size
 	MinimumSize = 150
+	// after calling google home, how long google home sleep (second)
+	GoogleHomeInterval = 10
+
 )
 
 var (
@@ -147,7 +151,7 @@ func callGoogleAPI(ghURL string) {
 	}
 
 	go func() {
-		time.Sleep(5 * time.Second)
+		time.Sleep(GoogleHomeInterval * time.Second)
 		isRunning = true
 	}()
 }
