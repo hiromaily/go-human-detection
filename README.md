@@ -29,4 +29,7 @@ $ go-cv -mode 2
 ### Streaming from web camera on the web. 
 ```
 $ go-cv -mode 3 -port 8080
+# It would be helpful to cooperate with ngrok
+$ ngrok http 8080 
+  ==> http://xxx.ngrok.io
 ```
