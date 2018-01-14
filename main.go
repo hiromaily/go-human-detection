@@ -6,6 +6,7 @@ import (
 	gh "github.com/hiromaily/golibs/googlehome"
 	lg "github.com/hiromaily/golibs/log"
 	"gocv.io/x/gocv"
+	"image"
 	"image/color"
 	"math/rand"
 	"os"
@@ -102,6 +103,7 @@ func faceDetection() {
 		fmt.Printf("found %d faces\n", len(rects))
 
 		// draw a rectangle around each face on the original image
+		biggest := image.Rectangle{}
 		for _, r := range rects {
 			//when detected face is too small, it should be skipped
 			fmt.Printf("x:%d, y:%d, width:%d, height:%d \n", r.Min.X, r.Min.Y, r.Size().X, r.Size().Y)
@@ -109,10 +111,18 @@ func faceDetection() {
 				continue
 			}
 
-			//TODO:only the biggest face should be detected.
-			gocv.Rectangle(img, r, blue, 3)
+			//only the biggest face should be detected.
+			if biggest.Size().X < r.Size().X {
+				biggest = r
+			}
+			//gocv.Rectangle(img, r, blue, 3)
+		}
+		//
+		if len(rects) != 0 && biggest.Size().X > 0 {
+			// only the biggest face should be detected.
+			gocv.Rectangle(img, biggest, blue, 3)
 
-			//TODO:After detecting face, say Hello by Google Home
+			// After detecting face, say Hello by Google Home
 			if *urlGoogleHome != "" && !isRunning {
 				callGoogleAPI(*urlGoogleHome)
 			}
