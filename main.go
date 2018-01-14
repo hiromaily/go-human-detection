@@ -14,6 +14,7 @@ import (
 	"math/rand"
 	"net/http"
 	"os"
+	"sync"
 	"time"
 )
 
@@ -31,6 +32,7 @@ var (
 	urlGoogleHome = flag.String("gh", "", "endpoint URL of Google Home device")
 	port          = flag.Int("port", 8080, "port of web server")
 	isRunning     bool
+	mtx           = new(sync.Mutex)
 	messages      = []string{
 		"Hi, How are you?",
 		"Hi, Nice to meet you!",
@@ -179,8 +181,14 @@ func faceDetection() {
 			gocv.Rectangle(img, biggest, blue, 3)
 
 			// After detecting face, say Hello by Google Home
+			mtx.Lock()
 			if *urlGoogleHome != "" && !isRunning {
-				callGoogleAPI(*urlGoogleHome)
+				isRunning = true
+				mtx.Unlock()
+
+				go callGoogleAPI(*urlGoogleHome)
+			} else {
+				mtx.Unlock()
 			}
 		}
 
@@ -313,6 +321,7 @@ func callGoogleAPI(ghURL string) {
 	idx := rand.Intn(len(messages)) //0 to (len-1)
 
 	//send message
+	lg.Infof("send message to Google Home: %s", messages[idx])
 	code, err := gh.SendMessage(ghURL, messages[idx])
 	if err != nil {
 		lg.Errorf("gh.SendMessage() return error| code:%d, err:%s", code, err)
@@ -320,6 +329,8 @@ func callGoogleAPI(ghURL string) {
 
 	go func() {
 		time.Sleep(GoogleHomeInterval * time.Second)
-		isRunning = true
+		mtx.Lock()
+		isRunning = false
+		mtx.Unlock()
 	}()
 }
