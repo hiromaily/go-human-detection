@@ -29,7 +29,7 @@ const (
 
 var (
 	mode          = flag.Int("mode", 0, "mode")
-	urlGoogleHome = flag.String("gh", "", "endpoint URL of Google Home device")
+	urlGoogleHome = flag.String("gh", os.Getenv("GOOGLE_HOME"), "endpoint URL of Google Home device")
 	port          = flag.Int("port", 8080, "port of web server")
 	isRunning     bool
 	mtx           = new(sync.Mutex)
