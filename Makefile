@@ -27,5 +27,8 @@ bld:
 exec:
 	go-cv
 
+exec2:
+	go-cv -gh 'https://xxxxx.ngrok.io/google-home-notifier'
+
 run:
 	go run -race ./main.go

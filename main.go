@@ -1,14 +1,42 @@
 package main
 
 import (
+	"flag"
 	"fmt"
+	gh "github.com/hiromaily/golibs/googlehome"
+	lg "github.com/hiromaily/golibs/log"
 	"gocv.io/x/gocv"
 	"image/color"
+	"math/rand"
 	"os"
-	//"time"
+	"time"
 )
 
-const MinimumSize = 150
+const (
+	MinimumSize = 150
+)
+
+var (
+	urlGoogleHome = flag.String("gh", "", "endpoint URL of Google Home device")
+	isRunning     bool
+	messages      = []string{
+		"Hi, How are you?",
+		"Hi, Nice to meet you!",
+		"Hi, Long time no see!",
+		"Talk to you later.",
+		"You look good.",
+		"Have a nice day at work!",
+	}
+)
+
+func init() {
+	//command-line
+	flag.Parse()
+
+	//log
+	lg.InitializeLog(lg.DebugStatus, lg.LogOff, 99,
+		"[HumanDetection]", "/tmp/go/human_detection.log")
+}
 
 func main() {
 	faceDetection()
@@ -73,8 +101,6 @@ func faceDetection() {
 		rects := classifier.DetectMultiScale(img)
 		fmt.Printf("found %d faces\n", len(rects))
 
-		//TODO:After detecting face, say Hello by Google Home
-
 		// draw a rectangle around each face on the original image
 		for _, r := range rects {
 			//when detected face is too small, it should be skipped
@@ -85,10 +111,33 @@ func faceDetection() {
 
 			//TODO:only the biggest face should be detected.
 			gocv.Rectangle(img, r, blue, 3)
+
+			//TODO:After detecting face, say Hello by Google Home
+			if *urlGoogleHome != "" && !isRunning {
+				callGoogleAPI(*urlGoogleHome)
+			}
 		}
 
 		// show the image in the window, and wait 1 millisecond
 		window.IMShow(img)
 		window.WaitKey(1)
 	}
+}
+func callGoogleAPI(ghURL string) {
+	//ghURL is expected like "https://xxxxx.ngrok.io/google-home-notifier"
+
+	//choose text from messages
+	rand.Seed(time.Now().UnixNano())
+	idx := rand.Intn(len(messages)) //0 to (len-1)
+
+	//send message
+	code, err := gh.SendMessage(ghURL, messages[idx])
+	if err != nil {
+		lg.Errorf("gh.SendMessage() return error| code:%d, err:%s", code, err)
+	}
+
+	go func() {
+		time.Sleep(5 * time.Second)
+		isRunning = true
+	}()
 }
