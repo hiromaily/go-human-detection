@@ -29,15 +29,16 @@ exec:
 
 exec1:
 	#face detection
-	go-cv -mode 1 -gh 'https://xxxxx.ngrok.io/google-home-notifier'
+	#go-cv -mode 1 -gh 'https://xxxxx.ngrok.io/google-home-notifier'
+	go-cv -mode 1
 
 exec2:
 	#motion detection
-	go-cv -mode 2 -gh 'https://xxxxx.ngrok.io/google-home-notifier'
+	go-cv -mode 2
 
 exec3:
 	#web stream
-	go-cv -mode 3 -port 8080 -gh 'https://xxxxx.ngrok.io/google-home-notifier'
+	go-cv -mode 3 -port 8080
 
 run:
 	go run -race ./main.go
